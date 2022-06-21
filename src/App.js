@@ -1,24 +1,70 @@
-import logo from './logo.svg';
-import './App.css';
+/* React */
+import { useEffect, useState } from 'react';
 
-function App() {
+/* Style */
+import styles from './App.css'
+import AppStyle from './AppStyle';
+
+/* Components */
+import HeaderArea from './Components/HeaderArea/HeaderArea';
+import InputArea from './Components/InputArea/InputArea';
+import ShowInfosArea from './Components/ShowInfosArea/ShowInfosArea';
+
+
+
+
+
+const App = () => {
+
+  const [weather, setWeather] = useState()
+  const [location, setLocation] = useState()
+  const [position, setPosition] = useState({
+    lat: '',
+    lon: '',
+  })
+  const [canSearch, setCanSearch] = useState(false)
+
+
+  const style = AppStyle()
+
+  if ( canSearch && (position.lat !== '' && position.lon !== '')) {
+    async function RequestServer() {
+      const base = 'https://api.weatherapi.com/v1/current.json?key=491f432d4c284619b08120422221606&q='
+      await fetch(base + `${position.lat},${position.lon}`)
+        .then( resp => resp.json() )
+        .then( data => {
+          setWeather(data.current)
+          setLocation(data.location)
+        })
+        .catch( error => {
+          console.log(error)
+        })
+
+        console.log(base + `${position.lat},${position.lon}`)
+    }
+    RequestServer()    
+    setCanSearch(false)
+
+  }
+
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <section className={ style.Container }>
+      <HeaderArea />
+
+
+      <InputArea 
+        setPosition={setPosition}
+        setCanSearch={setCanSearch}
+      />
+      
+      
+      <ShowInfosArea 
+        weather={weather}
+        location={location}
+      />
+    </section>
   );
 }
 
